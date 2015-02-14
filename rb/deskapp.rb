@@ -3,6 +3,12 @@
 
 ### 'go back to becuase this needs to change eventually'
 
+###################################################################
+
+### add documentation / a list of add_ commands
+
+###################################################################
+
 class Person
   def initialize (name, org)
     @name = name
@@ -37,6 +43,7 @@ class ProjectInfo ### add check for lengths (100 chars or less)
   end
   def add_Person (person)
   @people << person # requires Person class
+  end
   def add_User (user)
   @users << user  # requires User class
   end
