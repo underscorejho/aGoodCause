@@ -47,7 +47,7 @@ class User
   property :created_at,  DateTime
   ### add profiles (linkedin/social/github/etc)
   
-  belongs_to :projectInfo  ### not sure about capitalization here
+  belongs_to :projectinfo  ### not sure about capitalization here
 end
 
 ##########
@@ -66,6 +66,7 @@ class Project
 #  use a has-one relationship  # USING THIS FOR NOW
 #                              #
 
+  property :id,          Serial
   property :reputation,  Integer, :default => 0
   property :created_at,  DateTime
 
@@ -76,9 +77,10 @@ end
 
 ##########
 
-class ProjectInfo
+class Projectinfo
   include DataMapper::Resource
   
+  property :id,          Serial
   property :title,       String,  :required => true
   property :summary,     String,  :length => 120
   property :wwn,         Text,    :length => 120
@@ -88,9 +90,10 @@ end
 
 ##########
 
-class ProjectAbout
+class Projectabout
   include DataMapper::Resource
   
+  property :id,          Serial
   property :city,        String
   property :state,       String,  :length => 2
   property :wwn_extended, Text,   :length => 500
@@ -100,21 +103,24 @@ end
 
 ##########
 
-class ProjectEmail
+class Projectemail
   include DataMapper::Resource
   
+  property :id,          Serial
   property :email,       String
 end
 
-class ProjectPhone
+class Projectphone
   include DataMapper::Resource
 
+  property :id,          Serial
   property :phone,       String
 end
 
-class ProjectContact
+class Projectcontact
   include DataMapper::Resource
 
+  property :id,          Serial
   property :website,     String
   
   has n, :projectemails ### check capitalization
@@ -124,4 +130,11 @@ end
 ##########
 
 # done defining models
-DataMapper.finalize ### check if this is right
+DataMapper.finalize 
+
+#DataMapper.auto_migrate!   ### might need this later
+
+get '/' do
+  slim :index
+end
+
