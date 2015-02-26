@@ -1,0 +1,68 @@
+
+(BRAINSTORM)
+-Pintrest meets kickstarter meets philanthropy
+-Users generate causes
+-Stack Overflow style members/users
+-Sort by:
+--Location
+--Popularity
+--Random
+--Keyword
+--Most Recent
+-Kickstarter style project setup
+-For people who want to do something good, but don't know what
+-multiple block layout
+-build an app later on
+-Reddit style karma decay (but over like a month+ instead of a day)
+-Auto delete projects after 1 year
+--gives each project an equal chance
+--gives each project a chance to try again
+--keeps unused projects out of database
+-Use a series of Social Media bots to increase visibility
+--Twitter, Instagram, Facebook, Reddit(?), etc...
+--Posts picture/title/org/link-to-project
+
+NOTE:
+Do the hackathon powerpoint to figure out what you need to know
+
+IMPLEMENTATION
+Ruby? sooo (some framework)?
+
+
+PROBLEMS
+-how do you dynamically create pages for new ideas/causes/projects?
+
+
+FEATURES
+-Create Projects
+  -Info
+    -Profile (everything 100 characters or less)
+      -Title
+      -Summary
+      -Cover Picture
+      -People Behind the Project
+      -What We Need
+    -About the Project (More)
+      -More on People
+      -Location (Headquartes, Active)
+      -More What We Need/Where Money is Going
+      -Videos
+      -Pictures?
+    -Get in Touch
+      -Contact Info
+      -Emails
+      -Websites
+      -Phone Numbers
+  -Associated Users
+  -Locations (searchable)
+  -Points
+    -Given (shown)
+    -Effective (after decay) //Decay takes much longer than reddit, allows for time to be popular
+
+-Create Users
+  -User/Pass
+  -About Me (300 characters or less) // to keep attention on the projects, not the people
+  -Affiliated Projects
+  -LinkedIn links, Github Links, Social Media Links, Etc. // this is where they can brag about themselves
+  -Reputation
+

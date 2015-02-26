@@ -18,9 +18,10 @@ end
 
 class User
   @reputation = 0
-  def initialize (name, pass) ### probably not very secure
-  @name = name
+  def initialize (username, pass, name) ### probably not very secure
+  @username = username
   @pass = pass
+  @name = name
   end
   def add_aboutMe (str) ### add check for length (300 chars or less)
     @aboutMe = str
