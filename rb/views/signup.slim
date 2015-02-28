@@ -1,0 +1,30 @@
+
+h2 Create Account
+h6 * indicates required field
+
+form action="/signup" method="POST"
+  words Username:
+  br
+  input type="text" name="newusername" required="true" *
+  br
+  words Password:
+  br
+  input type="password" name="newpassword" required="true" *
+  br
+  words Full Name:
+  br
+  input type="text" name="newfullname"
+  br
+  words Email:
+  br
+  input type="email" name="newemail" required="true" *
+  br
+  words Organization:
+  br
+  input type="text" name="neworganization"
+  br
+  words About Me:
+  br
+  input type="text" name="newaboutme"
+  br
+  input.button type="submit" value="Create Account"

@@ -42,6 +42,7 @@ class User
   property :username,    String,  :required => true
   property :password,    String,  :required => true
   property :name,        String
+  property :email,       String
   property :organization, String
   property :about_me,    Text,    :length => 300
   property :created_at,  DateTime
@@ -132,9 +133,34 @@ end
 # done defining models
 DataMapper.finalize 
 
-#DataMapper.auto_migrate!   ### might need this later
+DataMapper.auto_migrate!   ### might need this later
+
+#############################
+#############################
 
 get '/' do
+  @users = User.all
   slim :index
 end
 
+#############################
+
+get '/signup' do
+  slim :signup
+end
+
+post '/signup' do ### add password verification, username and email duplicate protection
+  @new_user = User.create username: params[:newusername], 
+    password: params[:newpassword],
+    name: params[:newfullname],
+    email: params[:newemail],
+    organization: params[:neworganization],
+    about_me: params[:newaboutme]
+#  redirect to('/user/' @new_user.id)  ### THIS DOESN'T WORK
+  redirect to('/')                     ### not sure if this whole form works...
+end
+
+get '/user/:id' do
+  user = User.get params[:id]
+  user.username
+end
