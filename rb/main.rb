@@ -3,6 +3,7 @@
 
 # main file for ruby code for agc
 # using slim for templating
+# using datamapper and sqlite for db
 
 # Jared Henry Oviatt
 
@@ -13,129 +14,47 @@
 
 require 'sinatra'
 require 'slim'
-require 'data_mapper'
+require 'warden'
 
-# setting up data mapper
-# use a different .db filename on production
-DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/development.db")
-
-# define models
-### include more for classes from deskapp.rb?
-
-# example model
-#class Thing
-#  include DataMapper::Resource
-#
-#  property :id,          Serial
-#  property :title,       String
-#  property :body,        Text
-#  property :created_at,  DateTime
-#end
-
-##########
-
-class User
-  include DataMapper::Resource
-
-  property :id,          Serial
-  property :reputation,  Integer, :default => 0
-  property :username,    String,  :required => true
-  property :password,    String,  :required => true
-  property :name,        String
-  property :email,       String
-  property :organization, String
-  property :about_me,    Text,    :length => 300
-  property :created_at,  DateTime
-  ### add profiles (linkedin/social/github/etc)
-  
-  belongs_to :projectinfo  ### not sure about capitalization here
-end
-
-##########
-
-class Project
-  include DataMapper::Resource
-  
-#
-# for most of these
-#  use '.new' and use the unsaved values
-#  to '.create' a new Project
-#
-# -OR-
-#
-# '.create' all and instead    #
-#  use a has-one relationship  # USING THIS FOR NOW
-#                              #
-
-  property :id,          Serial
-  property :reputation,  Integer, :default => 0
-  property :created_at,  DateTime
-
-  has 1, :projectinfo    #
-  has 1, :projectabout   # check capitalization
-  has 1, :projectcontact #
-end
-
-##########
-
-class Projectinfo
-  include DataMapper::Resource
-  
-  property :id,          Serial
-  property :title,       String,  :required => true
-  property :summary,     String,  :length => 120
-  property :wwn,         Text,    :length => 120
-  
-  has n, :users  ### i think this should work... double check later
-end
-
-##########
-
-class Projectabout
-  include DataMapper::Resource
-  
-  property :id,          Serial
-  property :city,        String
-  property :state,       String,  :length => 2
-  property :wwn_extended, Text,   :length => 500
-  ### videos?
-  ### pictures?
-end
-
-##########
-
-class Projectemail
-  include DataMapper::Resource
-  
-  property :id,          Serial
-  property :email,       String
-end
-
-class Projectphone
-  include DataMapper::Resource
-
-  property :id,          Serial
-  property :phone,       String
-end
-
-class Projectcontact
-  include DataMapper::Resource
-
-  property :id,          Serial
-  property :website,     String
-  
-  has n, :projectemails ### check capitalization
-  has n, :projectphones ### check capitalization
-end
-
-##########
-
-# done defining models
-DataMapper.finalize 
-
-DataMapper.auto_migrate!   ### might need this later
+require './model.rb'
 
 #############################
+
+use Warden::Manager do |config|
+  config.serialize_into_session{|user| user.id}
+  config.serialize_from_session{|id| User.get(id)}
+  
+  config.scope_defaults :default,
+    strategies: [:password],
+    action: 'auth/unauthenticated'
+end
+
+Warden::Manager.before_failure do |env, opts|
+  env['REQUEST_METHOD'] = 'POST'
+end
+
+Warden::Strategies.add(:password) do
+  def valid?
+    params['user']['username'] && params['user']['password']
+  end
+
+  def authenticate!
+    user = User.first(username: params['user']['username'])
+    
+    if user.nil?
+      fail!("Username does not exist.")
+    elsif user.authenticate(params['user']['password'])
+      success!(user)
+    else
+      fail!("Unable to log in.")
+    end
+  end
+end
+
+#############################
+
+
+
 #############################
 
 get '/' do
@@ -145,22 +64,45 @@ end
 
 #############################
 
-get '/signup' do
+get '/auth/signup' do
   slim :signup
 end
 
-post '/signup' do ### add password verification, username and email duplicate protection
+post '/auth/signup' do ### add username and email duplicate protection ###### shits not finished
   @new_user = User.create username: params[:newusername], 
     password: params[:newpassword],
     name: params[:newfullname],
     email: params[:newemail],
     organization: params[:neworganization],
     about_me: params[:newaboutme]
-#  redirect to('/user/' @new_user.id)  ### THIS DOESN'T WORK
-  redirect to('/')                     ### not sure if this whole form works...
+  # Warden login for the new user
+  env['warden'].authenticate!
+  # Redirect to agc home
+  redirect '/'                 ### not sure if this whole form works...
 end
 
-get '/user/:id' do
-  user = User.get params[:id]
-  user.username
+get '/auth/login' do
+  slim :login
 end
+
+post '/auth/login' do
+  env['warden'].authenticate!
+
+  if session[return_to].nil?
+    redirect '/'
+  else
+    redirect session[:return_to]
+  end
+end
+
+get '/auth/logout' do
+  env['warden'].raw_session.inspect
+  env['warden'].logout
+  redirect '/'
+end
+
+post '/auth/unauthenticated' do
+  session[:return_to] = env['warden.options'][':attempted_path']
+  redirect '/auth/login'
+end
+

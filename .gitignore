@@ -1,4 +1,7 @@
 
 *.swp
+
 ideas/*
+
 development.db
+rb/deskapp.rb
